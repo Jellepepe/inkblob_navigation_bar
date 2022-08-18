@@ -7,7 +7,6 @@ import 'package:inkblob_navigation_bar/inkblob_navigation_bar.dart';
 
 import 'spiri_icons.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -58,11 +57,14 @@ class _MyHomePageState extends State<MyHomePage> {
       _animatingPage = true;
       _previousIndex = _selectedIndex;
       _selectedIndex = index;
-      _pageController.animateToPage(index,
-        duration: const Duration(milliseconds: 500), curve: Curves.easeOut).then((value) {
-          _animatingPage = false;
-          _previousIndex = _selectedIndex;
-        });
+      _pageController
+          .animateToPage(index,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOut)
+          .then((value) {
+        _animatingPage = false;
+        _previousIndex = _selectedIndex;
+      });
     });
   }
 
@@ -74,19 +76,29 @@ class _MyHomePageState extends State<MyHomePage> {
         child: PageView(
           controller: _pageController,
           onPageChanged: (index) {
-            if(!_animatingPage) {
+            if (!_animatingPage) {
               setState(() {
-              _previousIndex = _selectedIndex;
-              _selectedIndex = index;
-            });
+                _previousIndex = _selectedIndex;
+                _selectedIndex = index;
+              });
             }
           },
           children: <Widget>[
-            Container(color: Colors.blue,),
-            Container(color: Colors.red,),
-            Container(color: Colors.green,),
-            Container(color: Colors.yellow,),
-            Container(color: Colors.purple,),
+            Container(
+              color: Colors.blue,
+            ),
+            Container(
+              color: Colors.red,
+            ),
+            Container(
+              color: Colors.green,
+            ),
+            Container(
+              color: Colors.yellow,
+            ),
+            Container(
+              color: Colors.purple,
+            ),
           ],
         ),
       ),
@@ -98,43 +110,42 @@ class _MyHomePageState extends State<MyHomePage> {
         //animationDuration: const Duration(milliseconds: 500),
         items: <InkblobBarItem>[
           InkblobBarItem(
-            title: const Text('User', style: TextStyle(fontWeight: FontWeight.w500, color: Colors.blue)),
-            filledIcon: const Icon(SpiriIcons.fi_sr_user),
-            emptyIcon: const Icon(SpiriIcons.fi_rr_user),
-            color: Colors.blue
-          ),
+              title: const Text('User',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500, color: Colors.blue)),
+              filledIcon: const Icon(SpiriIcons.fi_sr_user),
+              emptyIcon: const Icon(SpiriIcons.fi_rr_user),
+              color: Colors.blue),
           InkblobBarItem(
-            title: const Text('Cube', style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red)),
+            title: const Text('Cube',
+                style:
+                    TextStyle(fontWeight: FontWeight.w500, color: Colors.red)),
             filledIcon: Container(
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(5)
-              )
-            ),
+                decoration: BoxDecoration(
+                    color: Colors.red, borderRadius: BorderRadius.circular(5))),
             emptyIcon: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Colors.red, width: 2)
-              )
-            ),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(color: Colors.red, width: 2))),
           ),
           InkblobBarItem(
-            filledIcon: const Icon(SpiriIcons.fi_sr_home),
-            emptyIcon: const Icon(SpiriIcons.fi_rr_home),
-            color: Colors.purple
-          ),
+              filledIcon: const Icon(SpiriIcons.fi_sr_home),
+              emptyIcon: const Icon(SpiriIcons.fi_rr_home),
+              color: Colors.purple),
           InkblobBarItem(
-            title: const Text('Heart', style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red)),
-            filledIcon: const Text('❤️', style: TextStyle(fontSize: 20)),
-            emptyIcon: const Text('🖤', style: TextStyle(fontSize: 20)),
-            color: Colors.red
-          ),
+              title: const Text('Heart',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500, color: Colors.red)),
+              filledIcon: const Text('❤️', style: TextStyle(fontSize: 20)),
+              emptyIcon: const Text('🖤', style: TextStyle(fontSize: 20)),
+              color: Colors.red),
           InkblobBarItem(
-            title: const Text('Message', style: TextStyle(fontWeight: FontWeight.w500, color: Colors.green)),
-            filledIcon: const Icon(SpiriIcons.fi_sr_comment),
-            emptyIcon: const Icon(SpiriIcons.fi_rr_comment),
-            color: Colors.green
-          ),
+              title: const Text('Message',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w500, color: Colors.green)),
+              filledIcon: const Icon(SpiriIcons.fi_sr_comment),
+              emptyIcon: const Icon(SpiriIcons.fi_rr_comment),
+              color: Colors.green),
         ],
       ),
     );
