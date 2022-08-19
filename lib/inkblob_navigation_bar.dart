@@ -178,22 +178,19 @@ class InkblobNavigationBar extends StatelessWidget {
                                   tween: isSelected ? Tween<double>(begin: 0, end: 1) : Tween<double>(begin: 1, end: 0),
                                   duration: animationDuration,
                                   curve: curve,
-                                  builder: (context, value, child) {
-                                    return _ItemWidget(
-                                      item: item,
-                                      fillValue: max(
-                                        1 - (1 - value) * (1 / percentageDist),
-                                        0,
-                                      ),
-                                      iconSize: iconSize,
-                                      selectionDirection:
-                                          (index > selectedIndex) || (isSelected && index > previousIndex)
-                                              ? TextDirection.ltr
-                                              : TextDirection.rtl,
-                                      itemWidth: itemWidth,
-                                      itemHeight: containerHeight,
-                                    );
-                                  },
+                                  builder: (context, value, child) => _ItemWidget(
+                                    item: item,
+                                    fillValue: max(
+                                      1 - (1 - value) * (1 / percentageDist),
+                                      0,
+                                    ),
+                                    iconSize: iconSize,
+                                    selectionDirection: (index > selectedIndex) || (isSelected && index > previousIndex)
+                                        ? TextDirection.ltr
+                                        : TextDirection.rtl,
+                                    itemWidth: itemWidth,
+                                    itemHeight: containerHeight,
+                                  ),
                                 )
                               : _ItemWidget(
                                   item: item,
@@ -218,7 +215,6 @@ class InkblobNavigationBar extends StatelessWidget {
 
 class _ItemWidget extends StatelessWidget {
   const _ItemWidget({
-    super.key,
     required this.item,
     required this.fillValue,
     required this.iconSize,
