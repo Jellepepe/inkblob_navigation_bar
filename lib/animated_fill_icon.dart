@@ -5,14 +5,15 @@
 import 'package:flutter/material.dart';
 
 class AnimatedFillIcon extends StatelessWidget {
-  const AnimatedFillIcon(
-      {required this.fillValue,
-      this.color = Colors.black,
-      required this.size,
-      required this.fillDirection,
-      required this.emptyIcon,
-      required this.filledIcon,
-      super.key});
+  const AnimatedFillIcon({
+    super.key,
+    required this.fillValue,
+    this.color = Colors.black,
+    required this.size,
+    required this.fillDirection,
+    required this.emptyIcon,
+    required this.filledIcon,
+  });
 
   final double fillValue;
   final Color color;
@@ -24,46 +25,54 @@ class AnimatedFillIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: size, maxWidth: size),
-        child: IconTheme(
-            data: IconThemeData(color: color, size: size),
-            child: Stack(children: [
-              ShaderMask(
-                  shaderCallback: (rect) => RadialGradient(
-                          center: fillDirection == TextDirection.ltr
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
-                          radius: 1,
-                          colors: const [
-                            Colors.black,
-                            Colors.black,
-                            Colors.transparent
-                          ],
-                          stops: [
-                            0,
-                            fillValue,
-                            fillValue
-                          ]).createShader(rect),
-                  blendMode: BlendMode.dstIn,
-                  child: filledIcon),
-              ShaderMask(
-                  shaderCallback: (rect) => RadialGradient(
-                          center: fillDirection == TextDirection.ltr
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
-                          radius: 1,
-                          colors: const [
-                            Colors.black,
-                            Colors.black,
-                            Colors.transparent
-                          ],
-                          stops: [
-                            0,
-                            fillValue,
-                            fillValue
-                          ]).createShader(rect),
-                  blendMode: BlendMode.dstOut,
-                  child: emptyIcon),
-            ])));
+      constraints: BoxConstraints(maxHeight: size, maxWidth: size),
+      child: IconTheme(
+        data: IconThemeData(color: color, size: size),
+        child: Stack(
+          children: [
+            ShaderMask(
+              shaderCallback: (rect) => RadialGradient(
+                center: fillDirection == TextDirection.ltr
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
+                radius: 1,
+                colors: const [
+                  Colors.black,
+                  Colors.black,
+                  Colors.transparent,
+                ],
+                stops: [
+                  0,
+                  fillValue,
+                  fillValue,
+                ],
+              ).createShader(rect),
+              blendMode: BlendMode.dstIn,
+              child: filledIcon,
+            ),
+            ShaderMask(
+              shaderCallback: (rect) => RadialGradient(
+                center: fillDirection == TextDirection.ltr
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
+                radius: 1,
+                colors: const [
+                  Colors.black,
+                  Colors.black,
+                  Colors.transparent,
+                ],
+                stops: [
+                  0,
+                  fillValue,
+                  fillValue,
+                ],
+              ).createShader(rect),
+              blendMode: BlendMode.dstOut,
+              child: emptyIcon,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -11,23 +11,22 @@ import 'package:flutter/material.dart';
 import 'animated_fill_icon.dart';
 
 class InkblobNavigationBar extends StatelessWidget {
-  const InkblobNavigationBar(
-      {Key? key,
-      this.showElevation = true,
-      this.iconSize = 24,
-      this.backgroundColor,
-      this.containerHeight = 60,
-      double? itemWidth,
-      this.animationDuration = const Duration(milliseconds: 270),
-      required this.selectedIndex,
-      int? previousIndex,
-      required this.items,
-      required this.onItemSelected,
-      this.curve = Curves.easeInOutExpo})
-      : assert(items.length >= 2),
+  const InkblobNavigationBar({
+    super.key,
+    this.showElevation = true,
+    this.iconSize = 24,
+    this.backgroundColor,
+    this.containerHeight = 60,
+    double? itemWidth,
+    this.animationDuration = const Duration(milliseconds: 270),
+    required this.selectedIndex,
+    int? previousIndex,
+    required this.items,
+    required this.onItemSelected,
+    this.curve = Curves.easeInOutExpo,
+  })  : assert(items.length >= 2),
         previousIndex = previousIndex ?? selectedIndex,
-        itemWidth = itemWidth ?? containerHeight * 2,
-        super(key: key);
+        itemWidth = itemWidth ?? containerHeight * 2;
 
   /// Defines the width of each item. Defaults to twice the [containerHeight].
   final double itemWidth;
@@ -95,117 +94,151 @@ class InkblobNavigationBar extends StatelessWidget {
         boxShadow: [
           if (showElevation)
             const BoxShadow(
-                color: Colors.black12, blurRadius: 2, spreadRadius: 2),
+              color: Colors.black12,
+              blurRadius: 2,
+              spreadRadius: 2,
+            ),
         ],
       ),
       child: SafeArea(
         child: SizedBox(
-            width: double.infinity,
-            height: containerHeight,
-            child: LayoutBuilder(builder: (context, constraints) {
+          width: double.infinity,
+          height: containerHeight,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
               double percentageDist = iconSize /
                   (((constraints.maxWidth - items.length * itemWidth) /
                               (items.length + 1) +
                           (itemWidth - iconSize)) *
                       (selectedIndex - previousIndex).abs());
-              return Stack(alignment: Alignment.center, children: [
-                TweenAnimationBuilder(
-                  duration: animationDuration,
-                  curve: curve,
-                  tween: Tween<double>(
+
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  TweenAnimationBuilder(
+                    duration: animationDuration,
+                    curve: curve,
+                    tween: Tween<double>(
                       begin: previousIndex.toDouble(),
-                      end: selectedIndex.toDouble()),
-                  builder: (context, double value, child) {
-                    double pos =
-                        ((constraints.maxWidth - items.length * itemWidth) /
-                                    (items.length + 1)) *
-                                (value + 1) +
-                            (value * itemWidth) +
-                            ((itemWidth - iconSize) / 2);
-                    double anim = (value - min(previousIndex, selectedIndex)) /
-                        max(1, (previousIndex - selectedIndex).abs());
-                    anim = previousIndex > selectedIndex ? 1 - anim : anim;
-                    Color color = Color.lerp(items[previousIndex].color,
-                            items[selectedIndex].color, anim) ??
-                        Colors.black;
-                    return Positioned(
+                      end: selectedIndex.toDouble(),
+                    ),
+                    builder: (context, double value, child) {
+                      double pos =
+                          ((constraints.maxWidth - items.length * itemWidth) /
+                                      (items.length + 1)) *
+                                  (value + 1) +
+                              (value * itemWidth) +
+                              ((itemWidth - iconSize) / 2);
+                      double anim =
+                          (value - min(previousIndex, selectedIndex)) /
+                              max(1, (previousIndex - selectedIndex).abs());
+                      anim = previousIndex > selectedIndex ? 1 - anim : anim;
+                      Color color = Color.lerp(items[previousIndex].color,
+                              items[selectedIndex].color, anim) ??
+                          Colors.black;
+
+                      return Positioned(
                         left: pos,
                         child: Transform.scale(
-                            scaleX: 0.9 +
-                                (anim > 0.5 ? 1 - anim : anim) *
-                                    (selectedIndex - previousIndex).abs(),
-                            child: Opacity(
-                                opacity: _opacity(anim, percentageDist),
-                                child: Container(
-                                  width: iconSize,
-                                  height: iconSize * 0.8,
-                                  decoration: BoxDecoration(
-                                      color: color,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: color,
-                                          blurRadius: 1,
-                                          spreadRadius: 1,
-                                        )
-                                      ],
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.elliptical(50, 40))),
-                                ))));
-                  },
-                ),
-                ...items.map((item) {
-                  int index = items.indexOf(item);
-                  bool isSelected = index == selectedIndex;
-                  return Positioned(
-                      left: ((constraints.maxWidth - items.length * itemWidth) /
-                                  (items.length + 1)) *
-                              (index + 1) +
-                          (index *
-                              itemWidth), //_indexToPos(index, items.length, constraints.maxWidth),
-                      child: GestureDetector(
-                        onTap: () => onItemSelected(index),
-                        child: (isSelected) ^ (index == previousIndex)
-                            ? TweenAnimationBuilder(
-                                tween: isSelected
-                                    ? Tween<double>(begin: 0, end: 1)
-                                    : Tween<double>(begin: 1, end: 0),
-                                duration: animationDuration,
-                                curve: curve,
-                                builder: (context, double value, child) =>
-                                    _ItemWidget(
-                                        item: item,
-                                        fillValue: max(
-                                            1 -
-                                                (1 - value) *
-                                                    (1 / percentageDist),
-                                            0),
-                                        iconSize: iconSize,
-                                        selectionDirection:
-                                            (index > selectedIndex) ||
-                                                    (isSelected &&
-                                                        index > previousIndex)
-                                                ? TextDirection.ltr
-                                                : TextDirection.rtl,
-                                        itemWidth: itemWidth,
-                                        itemHeight: containerHeight),
-                              )
-                            : _ItemWidget(
-                                item: item,
-                                fillValue: isSelected ? 1 : 0,
-                                iconSize: iconSize,
-                                itemWidth: itemWidth,
-                                itemHeight: containerHeight,
+                          scaleX: 0.9 +
+                              (anim > 0.5 ? 1 - anim : anim) *
+                                  (selectedIndex - previousIndex).abs(),
+                          child: Opacity(
+                            opacity: _opacity(anim, percentageDist),
+                            child: Container(
+                              width: iconSize,
+                              height: iconSize * 0.8,
+                              decoration: BoxDecoration(
+                                color: color,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: color,
+                                    blurRadius: 1,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                                borderRadius: const BorderRadius.all(
+                                  Radius.elliptical(50, 40),
+                                ),
                               ),
-                      ));
-                }).toList(),
-              ]);
-            })),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  ...items.map(
+                    (item) {
+                      int index = items.indexOf(item);
+                      bool isSelected = index == selectedIndex;
+
+                      return Positioned(
+                        left: ((constraints.maxWidth -
+                                        items.length * itemWidth) /
+                                    (items.length + 1)) *
+                                (index + 1) +
+                            (index *
+                                itemWidth), //_indexToPos(index, items.length, constraints.maxWidth),
+                        child: GestureDetector(
+                          onTap: () => onItemSelected(index),
+                          child: (isSelected) ^ (index == previousIndex)
+                              ? TweenAnimationBuilder<double>(
+                                  tween: isSelected
+                                      ? Tween<double>(begin: 0, end: 1)
+                                      : Tween<double>(begin: 1, end: 0),
+                                  duration: animationDuration,
+                                  curve: curve,
+                                  builder: (context, value, child) {
+                                    return _ItemWidget(
+                                      item: item,
+                                      fillValue: max(
+                                        1 - (1 - value) * (1 / percentageDist),
+                                        0,
+                                      ),
+                                      iconSize: iconSize,
+                                      selectionDirection:
+                                          (index > selectedIndex) ||
+                                                  (isSelected &&
+                                                      index > previousIndex)
+                                              ? TextDirection.ltr
+                                              : TextDirection.rtl,
+                                      itemWidth: itemWidth,
+                                      itemHeight: containerHeight,
+                                    );
+                                  },
+                                )
+                              : _ItemWidget(
+                                  item: item,
+                                  fillValue: isSelected ? 1 : 0,
+                                  iconSize: iconSize,
+                                  itemWidth: itemWidth,
+                                  itemHeight: containerHeight,
+                                ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }
 }
 
 class _ItemWidget extends StatelessWidget {
+  const _ItemWidget({
+    super.key,
+    required this.item,
+    required this.fillValue,
+    required this.iconSize,
+    this.selectionDirection = TextDirection.ltr,
+    required this.itemWidth,
+    required this.itemHeight,
+  });
+
   final double iconSize;
   final double fillValue;
   final InkblobBarItem item;
@@ -213,46 +246,42 @@ class _ItemWidget extends StatelessWidget {
   final double itemWidth;
   final double itemHeight;
 
-  const _ItemWidget({
-    Key? key,
-    required this.item,
-    required this.fillValue,
-    required this.iconSize,
-    this.selectionDirection = TextDirection.ltr,
-    required this.itemWidth,
-    required this.itemHeight,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Semantics(
-        container: true,
-        selected: fillValue == 1,
-        child: Container(
-            //color: Colors.green,
-            width: itemWidth,
-            height: itemHeight,
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Column(children: [
-              const Spacer(),
-              AnimatedFillIcon(
-                  fillValue: fillValue,
-                  size: iconSize,
-                  fillDirection: selectionDirection,
-                  emptyIcon: item.emptyIcon,
-                  filledIcon: item.filledIcon,
-                  color: item.color),
-              item.title != null
-                  ? Expanded(
-                      child: Transform(
-                          alignment: Alignment.topCenter,
-                          transform:
-                              Matrix4.translationValues(fillValue, fillValue, 1)
-                                ..scale(fillValue, fillValue, 1),
-                          child: item.title),
-                    )
-                  : const Spacer()
-            ])));
+      container: true,
+      selected: fillValue == 1,
+      child: Container(
+        //color: Colors.green,
+        width: itemWidth,
+        height: itemHeight,
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Column(
+          children: [
+            const Spacer(),
+            AnimatedFillIcon(
+              fillValue: fillValue,
+              size: iconSize,
+              fillDirection: selectionDirection,
+              emptyIcon: item.emptyIcon,
+              filledIcon: item.filledIcon,
+              color: item.color,
+            ),
+            item.title != null
+                ? Expanded(
+                    child: Transform(
+                      alignment: Alignment.topCenter,
+                      transform:
+                          Matrix4.translationValues(fillValue, fillValue, 1)
+                            ..scale(fillValue, fillValue, 1),
+                      child: item.title,
+                    ),
+                  )
+                : const Spacer(),
+          ],
+        ),
+      ),
+    );
   }
 }
 
