@@ -119,8 +119,9 @@ class InkblobNavigationBar extends StatelessWidget {
                     duration: animationDuration,
                     curve: curve,
                     tween: Tween<double>(
-                        begin: previousIndex.toDouble(),
-                        end: selectedIndex.toDouble()),
+                      begin: previousIndex.toDouble(),
+                      end: selectedIndex.toDouble(),
+                    ),
                     builder: (context, double value, child) {
                       double pos =
                           ((constraints.maxWidth - items.length * itemWidth) /
