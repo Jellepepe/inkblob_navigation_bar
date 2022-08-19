@@ -1,6 +1,6 @@
 name: inkblob_navigation_bar
 description: A custom navigation bar with smooth & dynamic ink blob transition effect.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/Jellepepe/inkblob_navigation_bar
 
 environment:

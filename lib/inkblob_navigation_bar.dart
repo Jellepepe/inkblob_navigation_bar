@@ -135,7 +135,7 @@ class InkblobNavigationBar extends StatelessWidget {
                             anim,
                           ) ??
                           Colors.black;
-
+                      if (anim == 1) return const SizedBox();
                       return Positioned(
                         left: _blobOffset(constraints.maxWidth, value),
                         child: Transform.scale(

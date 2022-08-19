@@ -47,15 +47,15 @@ Scaffold(
 | Attributes | Type | Description | Default |
 | -------------------- | -------------- | ---------------- | --------------- |
 | `showElevation`   | `bool` | Enable subtle shadow effect | `true` |
-| `items`   | `List<InkblobBarItem>` | item data for NavigationBar  | required |
-| `onItemSelected`  | `Function(int)` | callback function when item tapped | `null` |
-| `selectedIndex`  | `int` | selected item index of navigation bar. | required |
-| `previousIndex`  | `int` | previously selected item index of navigation bar. | `selectedIndex` |
-| `iconSize`  | `double` | size of icons. | `24.0` |
+| `items`   | `List<InkblobBarItem>` | Item data for NavigationBar  | required |
+| `onItemSelected`  | `Function(int)` | Callback function when item tapped | `null` |
+| `selectedIndex`  | `int` | Selected item index of navigation bar. | required |
+| `previousIndex`  | `int` | Previously selected item index of navigation bar. | `selectedIndex` |
+| `iconSize`  | `double` | Size of icons. | `24.0` |
 | `backgroundColor`  | `Color` | Background color of [CustomNavigationBar] | `Theme.bottomAppBarColor` |
-| `containerHeight`  | `double` | height of the NavigationBar | `60` |
-| `itemWidth`  | `double` | total width of each item | `2*containerHeight` |
-| `curve`  | `Curve` | animation curve of scale effect | `Curves.easInOutExpo` |
+| `containerHeight`  | `double` | Height of the NavigationBar | `60` |
+| `itemWidth`  | `double` | Total width of each item | `2*containerHeight` |
+| `curve`  | `Curve` | Animation curve of scale effect | `Curves.easInOutExpo` |
 | `animationDuration`  | `Duration` | Duration of the total animation | `Duration(milliseconds: 270)` |
 
 
@@ -71,28 +71,28 @@ InkblobNavigationBar(
       title: const Text('User'),
       filledIcon: const Icon(SpiriIcons.fi_sr_user),
       emptyIcon: const Icon(SpiriIcons.fi_rr_user),
-      color: Colors.blue
+      color: Colors.blue,
     ),
     // Custom Containers
     InkblobBarItem(
       filledIcon: Container(
         decoration: BoxDecoration(
           color: Colors.black,
-          borderRadius: BorderRadius.circular(12)
-        )
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
       emptyIcon: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black, width: 2)
-        )
+          border: Border.all(color: Colors.black, width: 2),
+        ),
       ),
     ),
     // Even Text Widgets
     InkblobBarItem(
       filledIcon: const Text('❤️', style: TextStyle(fontSize: 20)),
       emptyIcon: const Text('🖤', style: TextStyle(fontSize: 20)),
-      color: Colors.red
+      color: Colors.red,
     ),
   ],
 )
