@@ -58,9 +58,11 @@ class _MyHomePageState extends State<MyHomePage> {
       _previousIndex = _selectedIndex;
       _selectedIndex = index;
       _pageController
-          .animateToPage(index,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOut)
+          .animateToPage(
+        index,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
+      )
           .then((value) {
         _animatingPage = false;
         _previousIndex = _selectedIndex;
@@ -110,42 +112,64 @@ class _MyHomePageState extends State<MyHomePage> {
         //animationDuration: const Duration(milliseconds: 500),
         items: <InkblobBarItem>[
           InkblobBarItem(
-              title: const Text('User',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500, color: Colors.blue)),
-              filledIcon: const Icon(SpiriIcons.fi_sr_user),
-              emptyIcon: const Icon(SpiriIcons.fi_rr_user),
-              color: Colors.blue),
-          InkblobBarItem(
-            title: const Text('Cube',
-                style:
-                    TextStyle(fontWeight: FontWeight.w500, color: Colors.red)),
-            filledIcon: Container(
-                decoration: BoxDecoration(
-                    color: Colors.red, borderRadius: BorderRadius.circular(5))),
-            emptyIcon: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: Colors.red, width: 2))),
+            title: const Text(
+              'User',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.blue,
+              ),
+            ),
+            filledIcon: const Icon(SpiriIcons.fi_sr_user),
+            emptyIcon: const Icon(SpiriIcons.fi_rr_user),
+            color: Colors.blue,
           ),
           InkblobBarItem(
-              filledIcon: const Icon(SpiriIcons.fi_sr_home),
-              emptyIcon: const Icon(SpiriIcons.fi_rr_home),
-              color: Colors.purple),
+            title: const Text(
+              'Cube',
+              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.red),
+            ),
+            filledIcon: Container(
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+            emptyIcon: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                border: Border.all(color: Colors.red, width: 2),
+              ),
+            ),
+          ),
           InkblobBarItem(
-              title: const Text('Heart',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500, color: Colors.red)),
-              filledIcon: const Text('❤️', style: TextStyle(fontSize: 20)),
-              emptyIcon: const Text('🖤', style: TextStyle(fontSize: 20)),
-              color: Colors.red),
+            filledIcon: const Icon(SpiriIcons.fi_sr_home),
+            emptyIcon: const Icon(SpiriIcons.fi_rr_home),
+            color: Colors.purple,
+          ),
           InkblobBarItem(
-              title: const Text('Message',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500, color: Colors.green)),
-              filledIcon: const Icon(SpiriIcons.fi_sr_comment),
-              emptyIcon: const Icon(SpiriIcons.fi_rr_comment),
-              color: Colors.green),
+            title: const Text(
+              'Heart',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.red,
+              ),
+            ),
+            filledIcon: const Text('❤️', style: TextStyle(fontSize: 20)),
+            emptyIcon: const Text('🖤', style: TextStyle(fontSize: 20)),
+            color: Colors.red,
+          ),
+          InkblobBarItem(
+            title: const Text(
+              'Message',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.green,
+              ),
+            ),
+            filledIcon: const Icon(SpiriIcons.fi_sr_comment),
+            emptyIcon: const Icon(SpiriIcons.fi_rr_comment),
+            color: Colors.green,
+          ),
         ],
       ),
     );

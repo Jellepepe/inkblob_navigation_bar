@@ -66,22 +66,30 @@ class InkblobNavigationBar extends StatelessWidget {
 
   double _opacity(double value, double percentageDist) {
     if (percentageDist.isInfinite) return 0;
+    if (value < percentageDist / 8) return 0;
+    if (value > 1 - (percentageDist / 4)) return 0;
     if (value < percentageDist / 2) {
-      if (value < percentageDist / 8) {
-        return 0;
-      } else {
-        return (value - (percentageDist / 8)) *
-            (1 / ((percentageDist / 8) * 3));
-      }
-    } else if (value > 1 - (percentageDist / 2)) {
-      if (value > 1 - (percentageDist / 4)) {
-        return 0;
-      } else {
-        return (1 - (value + (percentageDist / 4))) *
-            (1 / (percentageDist / 4));
-      }
+      return (value - (percentageDist / 8)) * (1 / ((percentageDist / 8) * 3));
+    }
+    if (value > 1 - (percentageDist / 2)) {
+      return (1 - (value + (percentageDist / 4))) * (1 / (percentageDist / 4));
     }
     return 1;
+  }
+
+  /// Calculates the (left) offset of an icon based on its index
+  double _iconOffset(double maxWidth, double index) {
+    return ((maxWidth - items.length * itemWidth) / (items.length + 1)) * (index + 1) + (index * itemWidth);
+  }
+
+  /// Calculates the (left) offset of the inkblob based on the animation value
+  double _blobOffset(double maxWidth, double value) => _iconOffset(maxWidth, value) + ((itemWidth - iconSize) / 2);
+
+  /// Calculates the proportion of the inkblob animation distance it is covered by an icon
+  double _percentageDist(double maxWidth) {
+    return iconSize /
+        (((maxWidth - items.length * itemWidth) / (items.length + 1) + (itemWidth - iconSize)) *
+            (selectedIndex - previousIndex).abs());
   }
 
   @override
@@ -106,12 +114,7 @@ class InkblobNavigationBar extends StatelessWidget {
           height: containerHeight,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              double percentageDist = iconSize /
-                  (((constraints.maxWidth - items.length * itemWidth) /
-                              (items.length + 1) +
-                          (itemWidth - iconSize)) *
-                      (selectedIndex - previousIndex).abs());
-
+              double percentageDist = _percentageDist(constraints.maxWidth);
               return Stack(
                 alignment: Alignment.center,
                 children: [
@@ -123,26 +126,20 @@ class InkblobNavigationBar extends StatelessWidget {
                       end: selectedIndex.toDouble(),
                     ),
                     builder: (context, double value, child) {
-                      double pos =
-                          ((constraints.maxWidth - items.length * itemWidth) /
-                                      (items.length + 1)) *
-                                  (value + 1) +
-                              (value * itemWidth) +
-                              ((itemWidth - iconSize) / 2);
                       double anim =
-                          (value - min(previousIndex, selectedIndex)) /
-                              max(1, (previousIndex - selectedIndex).abs());
+                          (value - min(previousIndex, selectedIndex)) / max(1, (previousIndex - selectedIndex).abs());
                       anim = previousIndex > selectedIndex ? 1 - anim : anim;
-                      Color color = Color.lerp(items[previousIndex].color,
-                              items[selectedIndex].color, anim) ??
+                      Color color = Color.lerp(
+                            items[previousIndex].color,
+                            items[selectedIndex].color,
+                            anim,
+                          ) ??
                           Colors.black;
 
                       return Positioned(
-                        left: pos,
+                        left: _blobOffset(constraints.maxWidth, value),
                         child: Transform.scale(
-                          scaleX: 0.9 +
-                              (anim > 0.5 ? 1 - anim : anim) *
-                                  (selectedIndex - previousIndex).abs(),
+                          scaleX: 0.9 + (anim > 0.5 ? 1 - anim : anim) * (selectedIndex - previousIndex).abs(),
                           child: Opacity(
                             opacity: _opacity(anim, percentageDist),
                             child: Container(
@@ -173,19 +170,12 @@ class InkblobNavigationBar extends StatelessWidget {
                       bool isSelected = index == selectedIndex;
 
                       return Positioned(
-                        left: ((constraints.maxWidth -
-                                        items.length * itemWidth) /
-                                    (items.length + 1)) *
-                                (index + 1) +
-                            (index *
-                                itemWidth), //_indexToPos(index, items.length, constraints.maxWidth),
+                        left: _iconOffset(constraints.maxWidth, index.toDouble()),
                         child: GestureDetector(
                           onTap: () => onItemSelected(index),
                           child: (isSelected) ^ (index == previousIndex)
                               ? TweenAnimationBuilder<double>(
-                                  tween: isSelected
-                                      ? Tween<double>(begin: 0, end: 1)
-                                      : Tween<double>(begin: 1, end: 0),
+                                  tween: isSelected ? Tween<double>(begin: 0, end: 1) : Tween<double>(begin: 1, end: 0),
                                   duration: animationDuration,
                                   curve: curve,
                                   builder: (context, value, child) {
@@ -197,9 +187,7 @@ class InkblobNavigationBar extends StatelessWidget {
                                       ),
                                       iconSize: iconSize,
                                       selectionDirection:
-                                          (index > selectedIndex) ||
-                                                  (isSelected &&
-                                                      index > previousIndex)
+                                          (index > selectedIndex) || (isSelected && index > previousIndex)
                                               ? TextDirection.ltr
                                               : TextDirection.rtl,
                                       itemWidth: itemWidth,
@@ -252,7 +240,6 @@ class _ItemWidget extends StatelessWidget {
       container: true,
       selected: fillValue == 1,
       child: Container(
-        //color: Colors.green,
         width: itemWidth,
         height: itemHeight,
         padding: const EdgeInsets.symmetric(vertical: 2),
@@ -267,17 +254,21 @@ class _ItemWidget extends StatelessWidget {
               filledIcon: item.filledIcon,
               color: item.color,
             ),
-            item.title != null
-                ? Expanded(
-                    child: Transform(
-                      alignment: Alignment.topCenter,
-                      transform:
-                          Matrix4.translationValues(fillValue, fillValue, 1)
-                            ..scale(fillValue, fillValue, 1),
-                      child: item.title,
-                    ),
-                  )
-                : const Spacer(),
+            if (item.title != null && fillValue != 0)
+              Expanded(
+                child: fillValue == 1
+                    ? Align(
+                        alignment: Alignment.topCenter,
+                        child: item.title,
+                      )
+                    : Transform(
+                        alignment: Alignment.topCenter,
+                        transform: Matrix4.translationValues(fillValue, fillValue, 1)..scale(fillValue, fillValue, 1),
+                        child: item.title,
+                      ),
+              )
+            else
+              const Spacer()
           ],
         ),
       ),

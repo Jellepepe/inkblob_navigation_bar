@@ -24,54 +24,58 @@ class AnimatedFillIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget child;
+    if (fillValue == 1) {
+      child = filledIcon;
+    } else if (fillValue == 0) {
+      child = emptyIcon;
+    } else {
+      child = Stack(
+        children: [
+          ShaderMask(
+            shaderCallback: (rect) => RadialGradient(
+              center: fillDirection == TextDirection.ltr ? Alignment.centerLeft : Alignment.centerRight,
+              radius: 1,
+              colors: const [
+                Colors.black,
+                Colors.black,
+                Colors.transparent,
+              ],
+              stops: [
+                0,
+                fillValue,
+                fillValue,
+              ],
+            ).createShader(rect),
+            blendMode: BlendMode.dstIn,
+            child: filledIcon,
+          ),
+          ShaderMask(
+            shaderCallback: (rect) => RadialGradient(
+              center: fillDirection == TextDirection.ltr ? Alignment.centerLeft : Alignment.centerRight,
+              radius: 1,
+              colors: const [
+                Colors.black,
+                Colors.black,
+                Colors.transparent,
+              ],
+              stops: [
+                0,
+                fillValue,
+                fillValue,
+              ],
+            ).createShader(rect),
+            blendMode: BlendMode.dstOut,
+            child: emptyIcon,
+          ),
+        ],
+      );
+    }
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: size, maxWidth: size),
       child: IconTheme(
         data: IconThemeData(color: color, size: size),
-        child: Stack(
-          children: [
-            ShaderMask(
-              shaderCallback: (rect) => RadialGradient(
-                center: fillDirection == TextDirection.ltr
-                    ? Alignment.centerLeft
-                    : Alignment.centerRight,
-                radius: 1,
-                colors: const [
-                  Colors.black,
-                  Colors.black,
-                  Colors.transparent,
-                ],
-                stops: [
-                  0,
-                  fillValue,
-                  fillValue,
-                ],
-              ).createShader(rect),
-              blendMode: BlendMode.dstIn,
-              child: filledIcon,
-            ),
-            ShaderMask(
-              shaderCallback: (rect) => RadialGradient(
-                center: fillDirection == TextDirection.ltr
-                    ? Alignment.centerLeft
-                    : Alignment.centerRight,
-                radius: 1,
-                colors: const [
-                  Colors.black,
-                  Colors.black,
-                  Colors.transparent,
-                ],
-                stops: [
-                  0,
-                  fillValue,
-                  fillValue,
-                ],
-              ).createShader(rect),
-              blendMode: BlendMode.dstOut,
-              child: emptyIcon,
-            ),
-          ],
-        ),
+        child: child,
       ),
     );
   }
