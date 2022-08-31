@@ -172,6 +172,7 @@ class InkblobNavigationBar extends StatelessWidget {
                       return Positioned(
                         left: _iconOffset(constraints.maxWidth, index.toDouble()),
                         child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
                           onTap: () => onItemSelected(index),
                           child: (isSelected) ^ (index == previousIndex)
                               ? TweenAnimationBuilder<double>(
