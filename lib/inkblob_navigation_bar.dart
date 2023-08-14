@@ -96,7 +96,7 @@ class InkblobNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = backgroundColor ?? Theme.of(context).bottomAppBarColor;
-
+    var isLtr = Directionality.of(context) == TextDirection.ltr;
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
@@ -137,10 +137,11 @@ class InkblobNavigationBar extends StatelessWidget {
                           ) ??
                           Colors.black;
                       if (anim == 1) return const SizedBox();
-                      return Positioned(
-                        left: _blobOffset(constraints.maxWidth, value),
+                      return PositionedDirectional(
+                        start: _blobOffset(constraints.maxWidth, value),
                         child: Transform.scale(
                           scaleX:
+                              // 1,
                               0.9 + (anim > 0.5 ? 1 - anim : anim) * (selectedIndex - previousIndex).abs(),
                           child: Opacity(
                             opacity: _opacity(anim, percentageDist),
@@ -200,6 +201,7 @@ class InkblobNavigationBar extends StatelessWidget {
                                   fillValue: isSelected ? 1 : 0,
                                   iconSize: iconSize,
                                   itemWidth: itemWidth,
+                                  selectionDirection: Directionality.of(context),
                                   itemHeight: containerHeight,
                                 ),
                         ),

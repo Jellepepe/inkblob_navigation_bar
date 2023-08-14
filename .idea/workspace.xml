@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aa6fee33-1df5-4e1e-86db-717b569c8fd5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/inkblob_navigation_bar.iml" beforeDir="false" afterPath="$PROJECT_DIR$/inkblob_navigation_bar.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/inkblob_navigation_bar.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/inkblob_navigation_bar.dart" afterDir="false" />
