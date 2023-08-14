@@ -83,7 +83,8 @@ class InkblobNavigationBar extends StatelessWidget {
   }
 
   /// Calculates the (left) offset of the inkblob based on the animation value
-  double _blobOffset(double maxWidth, double value) => _iconOffset(maxWidth, value) + ((itemWidth - iconSize) / 2);
+  double _blobOffset(double maxWidth, double value) =>
+      _iconOffset(maxWidth, value) + ((itemWidth - iconSize) / 2);
 
   /// Calculates the proportion of the inkblob animation distance it is covered by an icon
   double _percentageDist(double maxWidth) {
@@ -126,8 +127,8 @@ class InkblobNavigationBar extends StatelessWidget {
                       end: selectedIndex.toDouble(),
                     ),
                     builder: (context, double value, child) {
-                      double anim =
-                          (value - min(previousIndex, selectedIndex)) / max(1, (previousIndex - selectedIndex).abs());
+                      double anim = (value - min(previousIndex, selectedIndex)) /
+                          max(1, (previousIndex - selectedIndex).abs());
                       anim = previousIndex > selectedIndex ? 1 - anim : anim;
                       Color color = Color.lerp(
                             items[previousIndex].color,
@@ -139,7 +140,8 @@ class InkblobNavigationBar extends StatelessWidget {
                       return Positioned(
                         left: _blobOffset(constraints.maxWidth, value),
                         child: Transform.scale(
-                          scaleX: 0.9 + (anim > 0.5 ? 1 - anim : anim) * (selectedIndex - previousIndex).abs(),
+                          scaleX:
+                              0.9 + (anim > 0.5 ? 1 - anim : anim) * (selectedIndex - previousIndex).abs(),
                           child: Opacity(
                             opacity: _opacity(anim, percentageDist),
                             child: Container(
@@ -169,14 +171,16 @@ class InkblobNavigationBar extends StatelessWidget {
                       int index = items.indexOf(item);
                       bool isSelected = index == selectedIndex;
 
-                      return Positioned(
-                        left: _iconOffset(constraints.maxWidth, index.toDouble()),
+                      return PositionedDirectional(
+                        start: _iconOffset(constraints.maxWidth, index.toDouble()),
                         child: GestureDetector(
                           behavior: HitTestBehavior.translucent,
                           onTap: () => onItemSelected(index),
                           child: (isSelected) ^ (index == previousIndex)
                               ? TweenAnimationBuilder<double>(
-                                  tween: isSelected ? Tween<double>(begin: 0, end: 1) : Tween<double>(begin: 1, end: 0),
+                                  tween: isSelected
+                                      ? Tween<double>(begin: 0, end: 1)
+                                      : Tween<double>(begin: 1, end: 0),
                                   duration: animationDuration,
                                   curve: curve,
                                   builder: (context, value, child) => _ItemWidget(
@@ -186,9 +190,7 @@ class InkblobNavigationBar extends StatelessWidget {
                                       0,
                                     ),
                                     iconSize: iconSize,
-                                    selectionDirection: (index > selectedIndex) || (isSelected && index > previousIndex)
-                                        ? TextDirection.ltr
-                                        : TextDirection.rtl,
+                                    selectionDirection: getSelectionDirection(context, index, isSelected),
                                     itemWidth: itemWidth,
                                     itemHeight: containerHeight,
                                   ),
@@ -211,6 +213,18 @@ class InkblobNavigationBar extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  TextDirection getSelectionDirection(BuildContext context, int index, bool isSelected) {
+    var isLtr = Directionality.of(context) == TextDirection.ltr;
+
+    return (index > selectedIndex) || (isSelected && index > previousIndex)
+        ? isLtr
+            ? TextDirection.ltr
+            : TextDirection.rtl
+        : isLtr
+            ? TextDirection.rtl
+            : TextDirection.ltr;
   }
 }
 
@@ -260,7 +274,8 @@ class _ItemWidget extends StatelessWidget {
                       )
                     : Transform(
                         alignment: Alignment.topCenter,
-                        transform: Matrix4.translationValues(fillValue, fillValue, 1)..scale(fillValue, fillValue, 1),
+                        transform: Matrix4.translationValues(fillValue, fillValue, 1)
+                          ..scale(fillValue, fillValue, 1),
                         child: item.title,
                       ),
               )
