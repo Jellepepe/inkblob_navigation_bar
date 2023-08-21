@@ -24,6 +24,7 @@ class InkblobNavigationBar extends StatelessWidget {
     required this.items,
     required this.onItemSelected,
     this.curve = Curves.easeInOutExpo,
+    this.fixedTitle = false,
   })  : assert(items.length >= 2),
         previousIndex = previousIndex ?? selectedIndex,
         itemWidth = itemWidth ?? containerHeight * 2;
@@ -64,6 +65,8 @@ class InkblobNavigationBar extends StatelessWidget {
   /// Defines the animation curve. Defaults to [Curves.easeInOutExpo].
   final Curve curve;
 
+  final bool fixedTitle;
+
   double _opacity(double value, double percentageDist) {
     if (percentageDist.isInfinite) return 0;
     if (value < percentageDist / 8) return 0;
@@ -96,7 +99,6 @@ class InkblobNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = backgroundColor ?? Theme.of(context).bottomAppBarColor;
-    var isLtr = Directionality.of(context) == TextDirection.ltr;
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
@@ -171,39 +173,50 @@ class InkblobNavigationBar extends StatelessWidget {
                     (item) {
                       int index = items.indexOf(item);
                       bool isSelected = index == selectedIndex;
-
                       return PositionedDirectional(
                         start: _iconOffset(constraints.maxWidth, index.toDouble()),
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () => onItemSelected(index),
-                          child: (isSelected) ^ (index == previousIndex)
-                              ? TweenAnimationBuilder<double>(
-                                  tween: isSelected
-                                      ? Tween<double>(begin: 0, end: 1)
-                                      : Tween<double>(begin: 1, end: 0),
-                                  duration: animationDuration,
-                                  curve: curve,
-                                  builder: (context, value, child) => _ItemWidget(
-                                    item: item,
-                                    fillValue: max(
-                                      1 - (1 - value) * (1 / percentageDist),
-                                      0,
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () => onItemSelected(index),
+                              child: (isSelected) ^ (index == previousIndex)
+                                  ? TweenAnimationBuilder<double>(
+                                      tween: isSelected
+                                          ? Tween<double>(begin: 0, end: 1)
+                                          : Tween<double>(begin: 1, end: 0),
+                                      duration: animationDuration,
+                                      curve: curve,
+                                      builder: (context, value, child) => _ItemWidget(
+                                        item: item,
+                                        fillValue: max(
+                                          1 - (1 - value) * (1 / percentageDist),
+                                          0,
+                                        ),
+                                        iconSize: iconSize,
+                                        selectionDirection: getSelectionDirection(context, index, isSelected),
+                                        itemWidth: itemWidth,
+                                        itemHeight: containerHeight,
+                                        fixedTitle: fixedTitle,
+                                      ),
+                                    )
+                                  : _ItemWidget(
+                                      item: item,
+                                      fillValue: isSelected ? 1 : 0,
+                                      iconSize: iconSize,
+                                      itemWidth: itemWidth,
+                                      selectionDirection: Directionality.of(context),
+                                      itemHeight: containerHeight,
+                                      fixedTitle: fixedTitle,
                                     ),
-                                    iconSize: iconSize,
-                                    selectionDirection: getSelectionDirection(context, index, isSelected),
-                                    itemWidth: itemWidth,
-                                    itemHeight: containerHeight,
-                                  ),
-                                )
-                              : _ItemWidget(
-                                  item: item,
-                                  fillValue: isSelected ? 1 : 0,
-                                  iconSize: iconSize,
-                                  itemWidth: itemWidth,
-                                  selectionDirection: Directionality.of(context),
-                                  itemHeight: containerHeight,
-                                ),
+                            ),
+                            if (item.badge != null)
+                              PositionedDirectional(
+                                start: item.badgeOffset?.dx ?? (itemWidth / 3),
+                                top: item.badgeOffset?.dy ?? (itemWidth / 8),
+                                child: IgnorePointer(child: item.badge ?? const SizedBox.shrink()),
+                              )
+                          ],
                         ),
                       );
                     },
@@ -238,6 +251,7 @@ class _ItemWidget extends StatelessWidget {
     this.selectionDirection = TextDirection.ltr,
     required this.itemWidth,
     required this.itemHeight,
+    required this.fixedTitle,
   });
 
   final double iconSize;
@@ -246,6 +260,7 @@ class _ItemWidget extends StatelessWidget {
   final TextDirection selectionDirection;
   final double itemWidth;
   final double itemHeight;
+  final bool fixedTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -269,20 +284,20 @@ class _ItemWidget extends StatelessWidget {
             ),
             if (item.title != null && fillValue != 0)
               Expanded(
-                child: fillValue == 1
-                    ? Align(
-                        alignment: Alignment.topCenter,
-                        child: item.title,
-                      )
-                    : Transform(
-                        alignment: Alignment.topCenter,
-                        transform: Matrix4.translationValues(fillValue, fillValue, 1)
-                          ..scale(fillValue, fillValue, 1),
-                        child: item.title,
-                      ),
+                child: Transform(
+                  alignment: Alignment.topCenter,
+                  transform: Matrix4.translationValues(fillValue, fillValue, 1)
+                    ..scale(fillValue, fillValue, 1),
+                  child: item.title,
+                ),
               )
             else
-              const Spacer()
+              fixedTitle
+                  ? Align(
+                      alignment: Alignment.topCenter,
+                      child: item.title,
+                    )
+                  : const Spacer(),
           ],
         ),
       ),
@@ -297,6 +312,8 @@ class InkblobBarItem {
     required this.filledIcon,
     this.title,
     this.color = Colors.black,
+    this.badge,
+    this.badgeOffset,
   });
 
   /// Defines this item's icon shown when not selected.
@@ -311,4 +328,7 @@ class InkblobBarItem {
   /// The [icon] color defined, also used to color the blob in transit. Defaults
   /// to [Colors.black].
   final Color color;
+
+  final Widget? badge;
+  final Offset? badgeOffset;
 }
