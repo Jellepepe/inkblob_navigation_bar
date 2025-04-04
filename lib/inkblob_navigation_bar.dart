@@ -11,20 +11,27 @@ import 'package:flutter/material.dart';
 import 'animated_fill_icon.dart';
 
 class InkblobNavigationBar extends StatelessWidget {
-  const InkblobNavigationBar({
-    super.key,
-    this.showElevation = true,
-    this.iconSize = 24,
-    this.backgroundColor,
-    this.containerHeight = 60,
-    double? itemWidth,
-    this.animationDuration = const Duration(milliseconds: 270),
-    required this.selectedIndex,
-    int? previousIndex,
-    required this.items,
-    required this.onItemSelected,
-    this.curve = Curves.easeInOutExpo,
-  })  : assert(items.length >= 2),
+  const InkblobNavigationBar(
+      {super.key,
+      this.showElevation = true,
+      this.iconSize = 24,
+      this.backgroundColor,
+      this.iconColor = Colors.black,
+      this.containerHeight = 60,
+      double? itemWidth,
+      this.animationDuration = const Duration(milliseconds: 270),
+      required this.selectedIndex,
+      int? previousIndex,
+      required this.items,
+      required this.onItemSelected,
+      this.curve = Curves.easeInOutExpo,
+      this.fixedTitle = false,
+      this.shadow = const BoxShadow(
+        color: Colors.black12,
+        blurRadius: 2,
+        spreadRadius: 2,
+      )})
+      : assert(items.length >= 2),
         previousIndex = previousIndex ?? selectedIndex,
         itemWidth = itemWidth ?? containerHeight * 2;
 
@@ -45,6 +52,8 @@ class InkblobNavigationBar extends StatelessWidget {
   /// [Theme.bottomAppBarColor] if not provided.
   final Color? backgroundColor;
 
+  final Color iconColor;
+
   /// Whether this navigation bar should show an elevation. Defaults to true.
   final bool showElevation;
 
@@ -63,6 +72,9 @@ class InkblobNavigationBar extends StatelessWidget {
 
   /// Defines the animation curve. Defaults to [Curves.easeInOutExpo].
   final Curve curve;
+
+  final bool fixedTitle;
+  final BoxShadow? shadow;
 
   double _opacity(double value, double percentageDist) {
     if (percentageDist.isInfinite) return 0;
@@ -94,19 +106,15 @@ class InkblobNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ?? Theme.of(context).bottomAppBarColor;
-
+    final bgColor = backgroundColor ?? Theme.of(context).bottomAppBarTheme.color;
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
-        boxShadow: [
-          if (showElevation)
-            const BoxShadow(
-              color: Colors.black12,
-              blurRadius: 2,
-              spreadRadius: 2,
-            ),
-        ],
+        boxShadow: shadow == null
+            ? null
+            : [
+                shadow!,
+              ],
       ),
       child: SafeArea(
         child: SizedBox(
@@ -134,12 +142,14 @@ class InkblobNavigationBar extends StatelessWidget {
                             items[selectedIndex].color,
                             anim,
                           ) ??
-                          Colors.black;
+                          iconColor;
                       if (anim == 1) return const SizedBox();
-                      return Positioned(
-                        left: _blobOffset(constraints.maxWidth, value),
+                      return PositionedDirectional(
+                        start: _blobOffset(constraints.maxWidth, value),
                         child: Transform.scale(
-                          scaleX: 0.9 + (anim > 0.5 ? 1 - anim : anim) * (selectedIndex - previousIndex).abs(),
+                          scaleX:
+                              // 1,
+                              0.9 + (anim > 0.5 ? 1 - anim : anim) * (selectedIndex - previousIndex).abs(),
                           child: Opacity(
                             opacity: _opacity(anim, percentageDist),
                             child: Container(
@@ -168,38 +178,50 @@ class InkblobNavigationBar extends StatelessWidget {
                     (item) {
                       int index = items.indexOf(item);
                       bool isSelected = index == selectedIndex;
-
-                      return Positioned(
-                        left: _iconOffset(constraints.maxWidth, index.toDouble()),
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onTap: () => onItemSelected(index),
-                          child: (isSelected) ^ (index == previousIndex)
-                              ? TweenAnimationBuilder<double>(
-                                  tween: isSelected ? Tween<double>(begin: 0, end: 1) : Tween<double>(begin: 1, end: 0),
-                                  duration: animationDuration,
-                                  curve: curve,
-                                  builder: (context, value, child) => _ItemWidget(
-                                    item: item,
-                                    fillValue: max(
-                                      1 - (1 - value) * (1 / percentageDist),
-                                      0,
+                      return PositionedDirectional(
+                        start: _iconOffset(constraints.maxWidth, index.toDouble()),
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () => onItemSelected(index),
+                              child: (isSelected) ^ (index == previousIndex)
+                                  ? TweenAnimationBuilder<double>(
+                                      tween: isSelected
+                                          ? Tween<double>(begin: 0, end: 1)
+                                          : Tween<double>(begin: 1, end: 0),
+                                      duration: animationDuration,
+                                      curve: curve,
+                                      builder: (context, value, child) => _ItemWidget(
+                                        item: item,
+                                        fillValue: max(
+                                          1 - (1 - value) * (1 / percentageDist),
+                                          0,
+                                        ),
+                                        iconSize: iconSize,
+                                        selectionDirection: getSelectionDirection(context, index, isSelected),
+                                        itemWidth: itemWidth,
+                                        itemHeight: containerHeight,
+                                        fixedTitle: fixedTitle,
+                                      ),
+                                    )
+                                  : _ItemWidget(
+                                      item: item,
+                                      fillValue: isSelected ? 1 : 0,
+                                      iconSize: iconSize,
+                                      itemWidth: itemWidth,
+                                      selectionDirection: Directionality.of(context),
+                                      itemHeight: containerHeight,
+                                      fixedTitle: fixedTitle,
                                     ),
-                                    iconSize: iconSize,
-                                    selectionDirection: (index > selectedIndex) || (isSelected && index > previousIndex)
-                                        ? TextDirection.ltr
-                                        : TextDirection.rtl,
-                                    itemWidth: itemWidth,
-                                    itemHeight: containerHeight,
-                                  ),
-                                )
-                              : _ItemWidget(
-                                  item: item,
-                                  fillValue: isSelected ? 1 : 0,
-                                  iconSize: iconSize,
-                                  itemWidth: itemWidth,
-                                  itemHeight: containerHeight,
-                                ),
+                            ),
+                            if (item.badge != null)
+                              PositionedDirectional(
+                                start: item.badgeOffset?.dx ?? (itemWidth / 3),
+                                top: item.badgeOffset?.dy ?? (itemWidth / 8),
+                                child: IgnorePointer(child: item.badge ?? const SizedBox.shrink()),
+                              )
+                          ],
                         ),
                       );
                     },
@@ -212,6 +234,18 @@ class InkblobNavigationBar extends StatelessWidget {
       ),
     );
   }
+
+  TextDirection getSelectionDirection(BuildContext context, int index, bool isSelected) {
+    var isLtr = Directionality.of(context) == TextDirection.ltr;
+
+    return (index > selectedIndex) || (isSelected && index > previousIndex)
+        ? isLtr
+            ? TextDirection.ltr
+            : TextDirection.rtl
+        : isLtr
+            ? TextDirection.rtl
+            : TextDirection.ltr;
+  }
 }
 
 class _ItemWidget extends StatelessWidget {
@@ -222,6 +256,7 @@ class _ItemWidget extends StatelessWidget {
     this.selectionDirection = TextDirection.ltr,
     required this.itemWidth,
     required this.itemHeight,
+    required this.fixedTitle,
   });
 
   final double iconSize;
@@ -230,6 +265,7 @@ class _ItemWidget extends StatelessWidget {
   final TextDirection selectionDirection;
   final double itemWidth;
   final double itemHeight;
+  final bool fixedTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -253,19 +289,19 @@ class _ItemWidget extends StatelessWidget {
             ),
             if (item.title != null && fillValue != 0)
               Expanded(
-                child: fillValue == 1
-                    ? Align(
-                        alignment: Alignment.topCenter,
-                        child: item.title,
-                      )
-                    : Transform(
-                        alignment: Alignment.topCenter,
-                        transform: Matrix4.translationValues(fillValue, fillValue, 1)..scale(fillValue, fillValue, 1),
-                        child: item.title,
-                      ),
+                child: Transform(
+                  alignment: Alignment.topCenter,
+                  transform: Matrix4.translationValues(fillValue, fillValue, 1)..scale(fillValue, fillValue, 1),
+                  child: item.title,
+                ),
               )
             else
-              const Spacer()
+              fixedTitle
+                  ? Align(
+                      alignment: Alignment.topCenter,
+                      child: item.title,
+                    )
+                  : const Spacer(),
           ],
         ),
       ),
@@ -280,6 +316,8 @@ class InkblobBarItem {
     required this.filledIcon,
     this.title,
     this.color = Colors.black,
+    this.badge,
+    this.badgeOffset,
   });
 
   /// Defines this item's icon shown when not selected.
@@ -294,4 +332,7 @@ class InkblobBarItem {
   /// The [icon] color defined, also used to color the blob in transit. Defaults
   /// to [Colors.black].
   final Color color;
+
+  final Widget? badge;
+  final Offset? badgeOffset;
 }

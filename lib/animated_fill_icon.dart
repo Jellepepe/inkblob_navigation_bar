@@ -34,7 +34,9 @@ class AnimatedFillIcon extends StatelessWidget {
         children: [
           ShaderMask(
             shaderCallback: (rect) => RadialGradient(
-              center: fillDirection == TextDirection.ltr ? Alignment.centerLeft : Alignment.centerRight,
+              center: fillDirection == TextDirection.ltr
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
               radius: 1,
               colors: const [
                 Colors.black,
@@ -52,7 +54,9 @@ class AnimatedFillIcon extends StatelessWidget {
           ),
           ShaderMask(
             shaderCallback: (rect) => RadialGradient(
-              center: fillDirection == TextDirection.ltr ? Alignment.centerLeft : Alignment.centerRight,
+              center: fillDirection == TextDirection.ltr
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
               radius: 1,
               colors: const [
                 Colors.black,
